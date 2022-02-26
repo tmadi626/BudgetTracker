@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+
+<TreeTableView fx:id="expenseTreeTableView" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+	<columns>
+        <TreeTableColumn minWidth="60.0" prefWidth="60.0" text="Catagory" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Jan" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Feb" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Mar" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Apr" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="May" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Jun" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Aug" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Sep" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Oct" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Nov" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="-1.0" text="Dec" />
+        <TreeTableColumn maxWidth="60.0" minWidth="30.0" prefWidth="49.0" text="Total" />
+		<TreeTableColumn maxWidth="60.0" minWidth="19.0" prefWidth="47.0" text="Avg" />
+	</columns>
+</TreeTableView>
