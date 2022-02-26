@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="TB.png" alt="Budget Tracker Logo"></a>
+ <img width=200px height=200px src="bin/BT_logo.png" alt="Budget Tracker Logo"></a>
 </p>
 
 <h3 align="center">Budget Tracker</h3>
@@ -18,7 +18,7 @@
 
 ## 🤔 Why Use it? 
 
-It's about time we stop manually checking expiry dates of products and have an app for that. 😛
+It's about time indviduals start taking an active role in tracking their budget in a more proactive way by using Budget. 😛
 
 ## 📝 Table of Contents
 
