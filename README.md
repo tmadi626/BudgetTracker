@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="TB.png" alt="Budget Tracker Logo"></a>
+ <img width=200px height=200px src="bin/BT_logo.png" alt="Budget Tracker Logo"></a>
 </p>
 
 <h3 align="center">Budget Tracker</h3>
