@@ -3,7 +3,7 @@
  <img width=200px height=200px src="assets/xpireLogo.png" alt="Xpire logo"></a>
 </p>
 
-<h3 align="center">Xpire</h3>
+<h3 align="center">Budget Tracker</h3>
 
 <div align="center">
 
