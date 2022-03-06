@@ -22,8 +22,8 @@
 }
 .navItem:hover{
 	-fx-background-color: #C3E5ED;
-	-fx-border-color:#1199B7;
-	-fx-border-width: 0px 0px 0px 3px;
+/*	-fx-border-color:#1199B7;
+	-fx-border-width: 0px 0px 0px 3px;*/
 	-fx-text-fill: #1199B7;
 	-fx-font-weight: bold;
 }
@@ -34,11 +34,11 @@
 }
 
 .choice-box {
-  -fx-background-color: #FFFFFF;
+/* -fx-background-color: #FFFFFF;
   -fx-background-radius: 20px;
   -fx-border-color: #EFEFEF;
   -fx-border-width: 0.5px;
-  -fx-border-radius: 20px;
+  -fx-border-radius: 20px; */ 
   -fx-mark-color: #1199B7; /* arrow color*/ 
   -fx-effect: dropshadow( gaussian, rgba(0, 0, 0, 0.3), 10, 0.5 , 0.0 , 0.0);
 }
@@ -51,11 +51,11 @@
 /*  Text color of focused item in the list*/
 .choice-box .menu-item:focused > .label { -fx-text-fill: #FFFFFF; }
 /*Selected item text color on the control itself */
-.choice-box > .label { -fx-text-fill: #FFFFFF; }
+.choice-box > .label { -fx-text-fill: black; }
 
 #AddTransactionBtn{
 	-fx-background-color: #1199B7;
-	-fx-border-radius: 30px;
+	-fx-border-radius: 30px ;
 	-fx-text-fill: #FFFFFF;
 	-fx-effect: dropshadow( gaussian, rgba(0, 0, 0, 0.3), 10, 0.1 , 0.0 , 0.0);
 }

@@ -1,5 +1,8 @@
 package application;
 	
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -12,20 +15,16 @@ import javafx.scene.paint.Color;
 
 
 public class Main extends Application {
+	public static ArrayList<Category> categories = new ArrayList<Category>();
+	public static HashMap<String,ArrayList<Category>> cOptions = new HashMap<String,ArrayList<Category>>();
+	
 	@Override
 	public void start(Stage stage) {
 		try {
-//			Parent hP = FXMLLoader.load(getClass().getResource("/homePage.fxml"));
-//			Parent eP = FXMLLoader.load(getClass().getResource("/expensePage.fxml"));
-//			Parent iP = FXMLLoader.load(getClass().getResource("/incomePage.fxml"));
+
 			Parent root = FXMLLoader.load(getClass().getResource("/Main.fxml"));
-//			Group root = new Group();//Creating Root Node
-			//Creating a scene
-//		    FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("/Main.fxml"));
-//		    Parent root = loader.load();
-		    
-			Scene scene = new Scene(root,700,600,Color.web("EAE9F0"));
-//			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());	
+
+			Scene scene = new Scene(root,800,600,Color.web("EAE9F0"));
 			scene.getStylesheets().add("/application.css");
 
 			//making an icon and setting it
@@ -34,14 +33,10 @@ public class Main extends Application {
 			
 			//setting App Title
 			stage.setTitle("Budget Tracker");
-//			stage.setWidth(420);
-//			stage.setHeight(420);
-//			stage.setResizable(false);
-			
+
 			//setting scene to the created scene
 			stage.setScene(scene);
 			stage.show();	//Displaying the scene
-			Controller control = new Controller();
 			
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -51,4 +46,5 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
+	
 }

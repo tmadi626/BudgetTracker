@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="700.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controller">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="700.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainController">
    <children>
       <HBox alignment="CENTER_LEFT" minWidth="700.0" prefHeight="400.0" prefWidth="700.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -21,7 +21,7 @@
                   </ImageView>
                   <VBox layoutY="77.0" maxHeight="-Infinity" minWidth="112.0" AnchorPane.bottomAnchor="41.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="77.0">
                      <children>
-                        <Button id="btnHome" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnHome" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Home" textAlignment="CENTER">
+                        <Button id="btnHome" fx:id="btnHome" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnHome" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Home" textAlignment="CENTER">
                            <graphic>
                               <ImageView id="homeIcon" cache="true" fitHeight="16.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" translateX="10.0">
                                  <image>
@@ -30,7 +30,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button id="btnExpense" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnExpenses" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Expenses" textAlignment="CENTER">
+                        <Button id="btnExpense" fx:id="btnExpenses" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnExpenses" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Expenses" textAlignment="CENTER">
                            <graphic>
                               <ImageView cache="true" fitHeight="16.0" fitWidth="18.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true" translateX="10.0">
                                  <image>
@@ -39,7 +39,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button id="btnIncome" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnIncome" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Income">
+                        <Button id="btnIncome" fx:id="btnIncome" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnIncome" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Income">
                            <graphic>
                               <ImageView cache="true" fitHeight="16.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" translateX="10.0">
                                  <image>
@@ -48,7 +48,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button id="btnHistory" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnHistory" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="History" textAlignment="CENTER">
+                        <Button id="btnHistory" fx:id="btnHistory" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnHistory" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="History" textAlignment="CENTER">
                            <graphic>
                               <ImageView cache="true" fitHeight="16.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" translateX="10.0">
                                  <image>
@@ -57,7 +57,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button id="btnGoal" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnGoals" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Goals" textAlignment="CENTER">
+                        <Button id="btnGoal" fx:id="btnGoals" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnGoals" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Goals" textAlignment="CENTER">
                            <graphic>
                               <ImageView cache="true" fitHeight="16.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" translateX="10.0">
                                  <image>
@@ -66,7 +66,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <Button id="btnSummary" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnSummary" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Summary" textAlignment="CENTER">
+                        <Button id="btnSummary" fx:id="btnSummary" alignment="BASELINE_LEFT" graphicTextGap="20.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="112.0" mnemonicParsing="false" onAction="#btnSummary" prefHeight="47.0" prefWidth="112.0" styleClass="navItem" text="Summary" textAlignment="CENTER">
                            <graphic>
                               <ImageView cache="true" fitHeight="16.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true" translateX="10.0">
                                  <image>
@@ -79,9 +79,9 @@
                   </VBox>
                </children>
             </AnchorPane>
-            <AnchorPane maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="649.0">
+            <AnchorPane centerShape="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="649.0">
                <children>
-                  <StackPane fx:id="contentArea" prefHeight="400.0" prefWidth="573.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <StackPane fx:id="contentArea" alignment="TOP_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="573.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children></AnchorPane>
          </children>
       </HBox>
