@@ -5,6 +5,6 @@ public enum Page {
 	EXPENSES,
 	INCOME,
 	HISTORY,
-	GOAL,
+	GOALS,
 	SUMMARY;
 }

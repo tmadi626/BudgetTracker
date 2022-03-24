@@ -20,7 +20,7 @@ public class ExpenseController implements Initializable{
 
 	@FXML
 	private TreeTableView<Category> expenseTreeTableView;
-	@FXML
+	@FXML 
 	private TreeTableColumn<Category, String> colCategory;
 	@FXML
 	private TreeTableColumn<Category, Number> colJan, colFeb, colMar, colApr, colMay, colJun,colJul, colAug, colSep, colOct, colNov, colDec, colTotal, colAvg;
@@ -30,12 +30,14 @@ public class ExpenseController implements Initializable{
 	//The root node for all the categories
 	private TreeItem<Category> root = new TreeItem<Category>(rootCategory );
 	
+	private Model model;
 //	private ArrayList<TreeItem<Category>> categoriesList = new ArrayList<TreeItem<Category>>();
 	
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		root.setExpanded(true);
+		
 		root.expandedProperty().addListener(observable -> {
             if (!root.isExpanded()) {
             	root.setExpanded(true);
@@ -51,8 +53,8 @@ public class ExpenseController implements Initializable{
 			}
 		});
 		
+//		colJan.setCellValueFactory( param -> new SimpleDoubleProperty( param.getValue().getValue().getJan() ) );
 		colJan.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Category, Number>, ObservableValue<Number>>(){
-			@Override
 			public ObservableValue<Number> call(TreeTableColumn.CellDataFeatures<Category, Number> arg0) {
 				return new SimpleDoubleProperty(arg0.getValue().getValue().getJan());
 			}
@@ -60,7 +62,7 @@ public class ExpenseController implements Initializable{
 		colFeb.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Category, Number>, ObservableValue<Number>>(){
 			@Override
 			public ObservableValue<Number> call(TreeTableColumn.CellDataFeatures<Category, Number> arg0) {
-				return new SimpleDoubleProperty(arg0.getValue().getValue().getFeb());
+				return new SimpleDoubleProperty(arg0.getValue().getValue().getFeb()) ;
 			}
 		});
 		colMar.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Category, Number>, ObservableValue<Number>>(){
@@ -136,9 +138,7 @@ public class ExpenseController implements Initializable{
 			}
 		});
 		
-		
 		expenseTreeTableView.setRoot(root);
-		
 		setUpTable();
 	}
 
@@ -146,26 +146,23 @@ public class ExpenseController implements Initializable{
 	public void addTransaction(String title, String price, LocalDate date, String catagory, String type, TransactionType typeTransaction) {
 		// Create a new Transaction
 		Transaction newTransaction = new Transaction(title, Double.parseDouble(price), date, typeTransaction);
-		System.out.println("");
+		System.out.println("----------------------------------------");
 		System.out.println("Transaction created: ("+title+", "+price+", "+date+", "+typeTransaction+").");
 		
 		//If the category already exists
-		if(categoryExist(catagory)) {
-			System.out.println("Category already exists: "+catagory+".");
+		if(this.model.categoryExist(catagory)) {
 			
 			// check if the option exists:
-			if(optionExist(catagory, type)) {
-				System.out.println("Option already exists: "+type+".");
+			if(this.model.subCategoriesExist(catagory, type)) {
 				//get the option
-				Category p = getOptionWithName(catagory, type);
+				Category p = this.model.getSubCategoryWithName(catagory, type);
 				// Add the transaction to the option
 				p.addTransaction(newTransaction);
 			}
 			//If the option doesnt exist
 			else {
-				System.out.println("New option created: "+type+".");
 				//Get the Category
-				Category c = this.getCategoryWithName(catagory);
+				Category c = this.model.getCategoryWithName(catagory);
 				//Create new option
 				Category newOption = new Category(type,false, c);
 				// Add the Child(newOption) to the Parent(newCategory)
@@ -173,114 +170,135 @@ public class ExpenseController implements Initializable{
 				// Add the transaction to the option
 				newOption.addTransaction(newTransaction);
 				// Add the option to the list of options of that category	
-				Main.cOptions.get(catagory).add(newOption);
+				this.model.getSubCategories().get(catagory).add(newOption);
+				
+				//Tree view
+				//Get the Category
+				TreeItem<Category> categoryTreeItem = this.getCategoryFromTree(c);
+				this.addSubCategoryToTree(categoryTreeItem, newOption);
 			}
-			
-			System.out.println("Transaction has been added to Category: "+catagory+", under Option:"+type+".");
 		}
 		//If the category does not exist
 		else {
 			//Create a new Category
 			Category newCategory = new Category(catagory,true, rootCategory);
-			System.out.println("New Category created: "+catagory+".");
 			// Add the Child(newCategory) to the Parent(rootCategory)
 			rootCategory.addToChildren(newCategory);
 			//Create a new Option
 			Category newOption = new Category(type,false, newCategory);
-			System.out.println("New option created: "+type+".");
 			// Add the Child(newOption) to the Parent(newCategory)
 			newCategory.addToChildren(newOption);
 			// Add the transaction to the option
 			newOption.addTransaction(newTransaction);
-			System.out.println("Transaction: "+title +" added to option: "+type+".");
 			// Add the category to the list of catagories
-			Main.categories.add(newCategory);
-			// Add the option to the list of options of that category
-			Main.cOptions.put(catagory, new ArrayList<Category>());
-			Main.cOptions.get(catagory).add(newOption);
-			System.out.println("Transaction has been added to Category: "+catagory+", under Option:"+type+".");
- 
+			this.model.getCategories().add(newCategory);
+			// Add a new array list of options to the new category
+			this.model.getSubCategories().put(catagory, new ArrayList<Category>());
+			// Add the option to the array list of options of that category	
+			this.model.getSubCategories().get(catagory).add(newOption);
+			
+			//Tree View
+			TreeItem<Category> categoryTreeItem = this.addCategoryToTree(newCategory);
+			this.addSubCategoryToTree(categoryTreeItem, newOption);
 		}
-
-	}
-
-	public boolean categoryExist(String c) {
-		for(Category el: Main.categories) {
-			if(el.getName() == c) {
-				return true;
-			}
-		}
-		return false;
+		
+		expenseTreeTableView.refresh();
 	}
 	
-	public Category getCategoryWithName(String c) {
-		for(Category el: Main.categories) {
-			if(el.getName() == c) {
-				return el;
+	
+	public void setModel(Model m) {
+		this.model = m;
+		setUpTable();
+	}
+	
+	public Model getModel() {
+		return this.model;
+	}
+	
+	
+	public TreeItem<Category> addCategoryToTree(Category c) {
+		//Get the children of the root
+		ObservableList<TreeItem<Category>> rootChildren = root.getChildren();
+		TreeItem<Category> categoryTreeItem = new TreeItem<Category>(c);
+		categoryTreeItem.setExpanded(true);
+		categoryTreeItem.expandedProperty().addListener(observable -> {
+            if (!categoryTreeItem.isExpanded()) {
+            	categoryTreeItem.setExpanded(true);
+            }
+        });
+		//add the category to the table
+		rootChildren.add(categoryTreeItem);
+		return categoryTreeItem;
+	}
+
+	private TreeItem<Category> getCategoryFromTree(Category c) {//find the category
+		ObservableList<TreeItem<Category>> rootChildren = root.getChildren();
+		for (TreeItem<Category> categoryTreeItem: rootChildren) {
+			if(c == categoryTreeItem.getValue()) {
+				return categoryTreeItem;
 			}
 		}
 		return null;
 	}
 	
-	public boolean optionExist(String c, String p) {
-		ArrayList<Category> pList = Main.cOptions.get(c);
-		for(Category el: pList) {
-			if(el.getName() == p) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public Category getOptionWithName(String c, String p) {
-		ArrayList<Category> pList = Main.cOptions.get(c);
-		for(Category el: pList) {
-			if(el.getName() == p) {
-				return el;
-			}
-		}
-		return null;
-	}
-
-	//Creating the option under Category to display under Category
-//	public void createOptionInTable(String name, TreeItem<Category> catagory) {
-//		TreeItem<Category> option = new TreeItem<Category>(new Category(name) );
-//		
-//		catagory.getChildren().add(option);
-//	}
-	
-	// this function is reposnible for updating all items inside table
-	public void setUpTable() {
+	public void addSubCategoryToTree(TreeItem<Category> c, Category p) {
 		//Get the children of the root
 		ObservableList<TreeItem<Category>> rootChildren = root.getChildren();
 		
-		//Loop through the categories and add them to the table
-		for( Category c: Main.categories) {
-			//create a category item and make it "always" expanded
-			TreeItem<Category> category = new TreeItem<Category>(c);
-			category.setExpanded(true);
-			category.expandedProperty().addListener(observable -> {
-	            if (!category.isExpanded()) {
-	            	category.setExpanded(true);
-	            }
-	        });
-			
-			//add the category to the table
-			rootChildren.add(category);
-			
-			//get the options of that category 
-			ArrayList<Category> cList = Main.cOptions.get(c.getName());
-			// check if the options exist
-			if (cList != null) {
-				//Loop through the options if not empty
-				if(!cList.isEmpty()) {
-					for(Category p: cList) {
-						//create an option item and add it under its category
-						TreeItem<Category> option = new TreeItem<Category>(p);
-						category.getChildren().add(option);
+		//create an subcategory node 
+		TreeItem<Category> subCategory = new TreeItem<Category>(p);
+		//find the category 
+		int categoryTreeItemINDEX = rootChildren.indexOf(c);
+		TreeItem<Category> categoryTreeItem = rootChildren.get(categoryTreeItemINDEX);
+		// add the subcategory under the category
+		categoryTreeItem.getChildren().add(subCategory);
+	}
+	
+//	private TreeItem<Category> getSubCategoryFromTree(TreeItem<Category> c, Category p) {//find the category
+//		ObservableList<TreeItem<Category>> categoryChildren = c.getChildren();
+//		for (TreeItem<Category> subCategoryTreeItem: categoryChildren) {
+//			if(p == subCategoryTreeItem.getValue()) {
+//				return subCategoryTreeItem;
+//			}
+//		}
+//		return null;
+//	}
+	
+	// this function is reposnible for updating all items inside table when newly instance of the app is made 
+	public void setUpTable() {
+		if(this.model != null) {
+			//Get the children of the root
+			ObservableList<TreeItem<Category>> rootChildren = root.getChildren();
+//			try {
+				//Loop through the categories and add them to the table
+				for( Category c: this.model.getCategories()) {
+					//create a category item and make it "always" expanded
+					TreeItem<Category> category = new TreeItem<Category>(c);
+					category.setExpanded(true);
+					category.expandedProperty().addListener(observable -> {
+			            if (!category.isExpanded()) {
+			            	category.setExpanded(true);
+			            }
+			        });
+					
+					//add the category to the table
+					rootChildren.add(category);
+					
+					//get the options of that category 
+					ArrayList<Category> cList = this.model.getSubCategories().get(c.getName());
+					// check if the options exist
+					if (cList != null) {
+						//Loop through the options if not empty
+						if(!cList.isEmpty()) {
+							for(Category p: cList) {
+								//create an option node and add it under its category
+								TreeItem<Category> option = new TreeItem<Category>(p);
+								category.getChildren().add(option);
+							}
+						}
 					}
 				}
-			}
+//			}catch(Exception e) {e.printStackTrace();}
 		}
 	}
 }

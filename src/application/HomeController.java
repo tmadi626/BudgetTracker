@@ -50,10 +50,11 @@ public class HomeController implements Initializable{
 	@FXML
 	private RadioButton typeIncome, typeExpense; 
 	
-	//Creating an instance of the Expense Controller
-	ExpenseController expenseController = new ExpenseController();
-	//Creating an instance of the Income Controller
-	IncomeController incomeController = new IncomeController ();
+	private Model model;
+	
+
+	private ExpenseController expenseController;
+	private IncomeController incomeController;
 	
 	@FXML
 	private void addTransaction() {
@@ -65,14 +66,13 @@ public class HomeController implements Initializable{
 		String type = subCategoryField.getValue();
 		TransactionType typeTransaction = getTransactionType();
 
-		
 		//Add the transaction if the data valid - Not Done
 		if(fieldsValid()) {
 			//Adding the Transaction to Income Sheet:
 			if(typeTransaction == TransactionType.INCOME) {
 				incomeController.addTransaction(title, price, date, category, type, typeTransaction);		
 			}//Adding the Transaction to Expesne Sheet:
-			else {
+			else if (typeTransaction == TransactionType.EXPENSE) {
 				expenseController.addTransaction(title, price, date, category, type, typeTransaction);
 			}
 
@@ -143,6 +143,14 @@ public class HomeController implements Initializable{
 		}
 	}
 	
+	public void setExpenseController(ExpenseController c) {
+		this.expenseController = c;
+	}
+	
+	public void setIncomeController(IncomeController c) {
+		this.incomeController = c;
+	}
+	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		
@@ -181,8 +189,18 @@ public class HomeController implements Initializable{
 		dateField.setValue(LocalDate.now());
 	}
 	
+	public void setModel(Model m) {
+		this.model = m;
+//		System.out.println("HomeController| Model has been set. 2");
+	}
+	
+	public Model getModel() {
+		return this.model;
+	}
+	
+	
 	@FXML
-	private void updateOptions() {
+	private void updateOptions() {//This function gets called whenever the category changes to update the options
 		String[] subCategory = options.get( categoryField.getValue() );
 		subCategoryField.getItems().clear();
 		subCategoryField.getItems().addAll(subCategory);

@@ -17,7 +17,7 @@ public class Category {
 		this.setName(name);
 		this.isParent = parent;
 		this.parent = p;
-	}
+	} 
 	public String getName() {
 		return name;
 	}
@@ -66,7 +66,9 @@ public class Category {
 			}
 			if (this.parent == null) {
 				System.out.println("This is the most Parent: "+this.getName()+".");
-				System.out.println("And one child Feb has value of: "+this.children.get(0).getFeb()+".");
+				System.out.println("And Parent's March has value of: "+this.getMar()+".");
+				System.out.println("But the child's March has value of: "+this.children.get(0).getMar()+".");
+				this.children.get(0).printTransactions();
 				return;
 			}
 		}
@@ -88,6 +90,7 @@ public class Category {
 		System.out.println("");
 	}
 	public void addTransaction(Transaction transaction) {
+		System.out.println("Transaction: "+transaction.getValue()+" added to "+this.getName());
 		transactions.add(transaction);
 		updateValues(transaction, true);
 		parent.updateParentValues();
@@ -101,6 +104,7 @@ public class Category {
 	
 	//This function responsible for Summing all months expenses including Total and average
 	public void updateValues(Transaction transaction, boolean addition) {
+		System.out.println("Updating values of: "+this.getName());
 		//Loops through all the transactions within this category and updates
 		for(Transaction t : transactions) {
 			if(t == transaction) {
