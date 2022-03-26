@@ -1,8 +1,10 @@
 package application;
 
+import java.math.BigDecimal;
 //import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -12,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
@@ -20,16 +23,24 @@ import javafx.scene.control.TextField;
 public class HomeController implements Initializable{
 	
 	@FXML
-	private TextField titleField, numField;
+	private TextField titleField, numField, leftToSpendField, monthlyBudgetField;
 	@FXML
 	private DatePicker dateField;
 	@FXML
 	private ChoiceBox<String> categoryField, subCategoryField;
+	@FXML
+	private RadioButton typeIncome, typeExpense; 
+	@FXML
+	private ProgressBar budgetMeter;
 	
+	private ExpenseController expenseController;
+	private IncomeController incomeController;
 	
 	private HashMap<String, String[]> options = new HashMap<String, String[]>();
 	
-	private String[] categoryList = {"Children","Debt","Education","Entertainment","Everyday","Gifts","Health","Home","Insurance","Pets","Technology","Transportation","Travel","Utilities","Invests&eTransfer"};
+	//Expenses Options:
+	private String[] expenseCategoryList = {"Children","Debt","Education","Entertainment","Everyday","Gifts","Health","Home","Insurance","Pets","Technology","Transportation","Travel","Utilities","Invests&eTransfer"};
+
 	private String[] Children = {"Activities","Allowance","Medical","Childcare","Clothing","School","Toys","Other"};
 	private String[] Debt = {"Credit cards","Student loans","Other loans","Taxes (federal)","Taxes (state)","Other"};
 	private String[] Education = {"Tuition","Books","Lessons","Other"};
@@ -45,16 +56,21 @@ public class HomeController implements Initializable{
 	private String[] Travel = {"Airfare","Hotels","Food","Transportation","Entertainment","Other"};
 	private String[] Utilities = {"Phone","TV","Internet","Electricity","Heat/gas","Water","Trash","Other"};
 	private String[] Invests = {"Investments","eTransfer"};
+
+	//Income Options:
+	private String[] incomeCategoryList = {"Wages","Other Income"};
+	
+	private String[] Wages = {"Paycheck","Bonus", "Others"};
+	private String[] incomeOther = {"Transfer from savings","Interest Income", "Dividends", "Gifts", "Refunds", "Investments"};
 	
 
-	@FXML
-	private RadioButton typeIncome, typeExpense; 
 	
 	private Model model;
+	private Double monthlyBudget;
+	private Double leftToSpend;
 	
+	BigDecimal progressValue = new BigDecimal(String.format("%.2f", 0.0));
 
-	private ExpenseController expenseController;
-	private IncomeController incomeController;
 	
 	@FXML
 	private void addTransaction() {
@@ -78,13 +94,19 @@ public class HomeController implements Initializable{
 
 			//Clear the fields while keeping the date and the catagory
 			titleField.clear();
-			numField.clear();	
+			numField.clear();
+			
+			//Update the left to spend field 
+			setLeftToSpendField();
 		}
 
 	}
 
 	@FXML
 	private boolean fieldsValid() {
+		//Only works on current Year
+		int currentYr = LocalDate.now().getYear();
+		
 		String title = titleField.getText();
 		String price = numField.getText();
 		LocalDate date = dateField.getValue();
@@ -116,7 +138,7 @@ public class HomeController implements Initializable{
 			numField.setStyle(null);
 		}
 		//Check The Date Field
-		if (date == null) {
+		if (date == null || date.getYear() != currentYr) {
 			dateField.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
 			new animatefx.animation.Shake(dateField).play();
 			return false;
@@ -154,18 +176,34 @@ public class HomeController implements Initializable{
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		
-//		//Allowing only Numeric values in numField
+//		//Allowing only Numeric values in these Text Fields:
 		numField.textProperty().addListener(new ChangeListener<String>() {
 		    @Override
 		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
 		        String newValue) {
 		        if (!newValue.matches("\\d*")) {
-		        	
 		        	numField.setText(newValue.replaceAll("[^\\d]", "") );	//Integers not doubles
 		        }
 		    }
 		});
+		//Initlize the left to spend Field
+		monthlyBudgetField.setText("0");
+		monthlyBudgetField.textProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
+		        String newValue) {
+		        if (!newValue.matches("\\d*")) {
+		        	monthlyBudgetField.setText(newValue.replaceAll("[^\\d]", "") );	//Integers not doubles
+
+		        }else if(newValue.matches("\\d*")){
+		        	setMonthlyBudget();
+		        	System.out.println("monthlyBudgetField Updating");
+		        }
+		    }
+		});
+		
 		//Inilizing categories with their corresponding options
+		//Expense Options
 		options.put("Children", Children);
 		options.put("Debt", Debt);
 		options.put("Education", Education);
@@ -181,10 +219,13 @@ public class HomeController implements Initializable{
 		options.put("Travel", Travel);
 		options.put("Utilities", Utilities);
 		options.put("Invests&eTransfer", Invests);
+		//Income Options
+		options.put("Wages", Wages);
+		options.put("Other Income", incomeOther);
 		
-		//initializing predetermined List of Catagories to the dropdown
-		categoryField.getItems().addAll(categoryList);
-		
+		//Initializing predetermined List of Catagories to the dropdown
+		setCategoryDropDown();
+
 		//Setting the date field to the current date of the machine
 		dateField.setValue(LocalDate.now());
 	}
@@ -198,12 +239,84 @@ public class HomeController implements Initializable{
 		return this.model;
 	}
 	
+	@FXML
+	private void setMonthlyBudget() {
+		//This function responsible for setting the "Monthly Budget" field
+		this.monthlyBudget = Double.parseDouble( monthlyBudgetField.getText() );
+		setLeftToSpendField();
+	}
+	//This function responsible for setting the "Left To Spend" field
+	private void setLeftToSpendField() {
+		
+		Month currMonth = LocalDate.now().getMonth();
+		Double value = 0.0;
+		
+		if(currMonth==Month.JANUARY) {
+			value = expenseController.getRootCategory().getJan();
+		}else if(currMonth==Month.FEBRUARY) {
+			value = expenseController.getRootCategory().getFeb();
+		}else if(currMonth==Month.MARCH) {
+			value = expenseController.getRootCategory().getMar();
+		}else if(currMonth==Month.APRIL) {
+			value = expenseController.getRootCategory().getApr();
+		}else if(currMonth==Month.MAY) {
+			value = expenseController.getRootCategory().getMay();
+		}else if(currMonth==Month.JUNE) {
+			value = expenseController.getRootCategory().getJun();
+		}else if(currMonth==Month.JULY) {
+			value = expenseController.getRootCategory().getJul();
+		}else if(currMonth==Month.AUGUST) {
+			value = expenseController.getRootCategory().getAug();
+		}else if(currMonth==Month.SEPTEMBER) {
+			value = expenseController.getRootCategory().getSep();
+		}else if(currMonth==Month.OCTOBER) {
+			value = expenseController.getRootCategory().getOct();
+		}else if(currMonth==Month.NOVEMBER) {
+			value = expenseController.getRootCategory().getNov();
+		}else if(currMonth==Month.DECEMBER) {
+			value = expenseController.getRootCategory().getDec();
+		}
+		
+		this.leftToSpend = monthlyBudget-value;
+		
+		leftToSpendField.setText( String.valueOf(this.leftToSpend));
+		
+		//Updating the Progress Bar (Budget Meter)
+		if(0<= (int) Math.round(this.leftToSpend/monthlyBudget)) {
+			progressValue = new BigDecimal(String.format("%.5f", this.leftToSpend/monthlyBudget));
+			this.budgetMeter.setProgress(progressValue.doubleValue());
+		}else {
+			System.out.println("ZERO!");
+			progressValue = new BigDecimal(String.format("%.2f", 0.0));
+			this.budgetMeter.setProgress(progressValue.doubleValue());
+		}
+	}
+	
+	@FXML
+	private void setCategoryDropDown(){
+//		System.out.println("HomeController| setCategoryDropDown");
+//		categoryField.setValue("");
+		subCategoryField.getItems().clear();
+		categoryField.getItems().clear();
+		TransactionType typeTransaction = getTransactionType();
+		if(typeTransaction == TransactionType.INCOME) {
+			categoryField.getItems().addAll(incomeCategoryList);
+		}//Adding the Transaction to Expesne Sheet:
+		else if (typeTransaction == TransactionType.EXPENSE) {
+			categoryField.getItems().addAll(expenseCategoryList);
+		}
+	}
 	
 	@FXML
 	private void updateOptions() {//This function gets called whenever the category changes to update the options
-		String[] subCategory = options.get( categoryField.getValue() );
-		subCategoryField.getItems().clear();
-		subCategoryField.getItems().addAll(subCategory);
+		try {
+			String[] subCategory = options.get( categoryField.getValue() );
+			subCategoryField.getItems().clear();
+			subCategoryField.getItems().addAll(subCategory);
+		}catch(Exception e) {
+			System.out.println(e);
+		}
+
 	}
 
 

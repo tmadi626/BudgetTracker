@@ -33,19 +33,19 @@
                                  <children>
                                     <Pane>
                                        <children>
-                                          <Label alignment="CENTER" contentDisplay="CENTER" text="Left to Spend" textAlignment="CENTER" />
-                                          <TextField alignment="CENTER" layoutY="21.0" prefHeight="17.0" prefWidth="71.0" promptText="0.00" />
+                                          <Label alignment="CENTER" contentDisplay="CENTER" text="Left to spend" textAlignment="CENTER" />
+                                          <TextField fx:id="leftToSpendField" alignment="CENTER" editable="false" layoutY="21.0" prefHeight="17.0" prefWidth="71.0" promptText="0.00" />
                                        </children>
                                     </Pane>
                                     <Pane>
                                        <children>
-                                          <Label alignment="CENTER" contentDisplay="CENTER" layoutX="16.0" text="Budget" textAlignment="CENTER" />
-                                          <TextField alignment="CENTER" layoutY="21.0" prefHeight="17.0" prefWidth="71.0" promptText="0.00" />
+                                          <Label alignment="CENTER" contentDisplay="CENTER" text="Monthly budget" textAlignment="CENTER" />
+                                          <TextField fx:id="monthlyBudgetField" alignment="CENTER" layoutX="8.0" layoutY="20.0" onInputMethodTextChanged="#setMonthlyBudget" prefHeight="17.0" prefWidth="71.0" promptText="0.00" />
                                        </children>
                                     </Pane>
                                  </children>
                               </HBox>
-                              <ProgressBar prefWidth="200.0" progress="0.0" />
+                              <ProgressBar fx:id="budgetMeter" prefWidth="200.0" progress="0.0" />
                            </children>
                            <padding>
                               <Insets bottom="15.0" top="5.0" />
@@ -149,12 +149,11 @@
                                     </Pane>
                                     <VBox alignment="CENTER_LEFT" spacing="3.0">
                                        <children>
-                                          <RadioButton fx:id="typeIncome" alignment="CENTER_LEFT" mnemonicParsing="false" selected="true" text="Income">
+                                          <RadioButton fx:id="typeIncome" alignment="CENTER_LEFT" mnemonicParsing="false" onAction="#setCategoryDropDown" selected="true" text="Income">
                                              <toggleGroup>
                                                 <ToggleGroup fx:id="TransactionType" />
-                                             </toggleGroup>
-                                          </RadioButton>
-                                          <RadioButton fx:id="typeExpense" mnemonicParsing="false" text="Expense" toggleGroup="$TransactionType" />
+                                             </toggleGroup></RadioButton>
+                                          <RadioButton fx:id="typeExpense" alignment="CENTER_LEFT" mnemonicParsing="false" onAction="#setCategoryDropDown" text="Expense" toggleGroup="$TransactionType" />
                                        </children>
                                     </VBox>
                                  </children>

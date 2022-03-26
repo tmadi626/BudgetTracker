@@ -31,8 +31,7 @@ public class ExpenseController implements Initializable{
 	private TreeItem<Category> root = new TreeItem<Category>(rootCategory );
 	
 	private Model model;
-//	private ArrayList<TreeItem<Category>> categoriesList = new ArrayList<TreeItem<Category>>();
-	
+
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
@@ -146,8 +145,8 @@ public class ExpenseController implements Initializable{
 	public void addTransaction(String title, String price, LocalDate date, String catagory, String type, TransactionType typeTransaction) {
 		// Create a new Transaction
 		Transaction newTransaction = new Transaction(title, Double.parseDouble(price), date, typeTransaction);
-		System.out.println("----------------------------------------");
-		System.out.println("Transaction created: ("+title+", "+price+", "+date+", "+typeTransaction+").");
+//		System.out.println("----------------------------------------");
+//		System.out.println("Transaction created: ("+title+", "+price+", "+date+", "+typeTransaction+").");
 		
 		//If the category already exists
 		if(this.model.categoryExist(catagory)) {
@@ -206,6 +205,10 @@ public class ExpenseController implements Initializable{
 	}
 	
 	
+	public Category getRootCategory() {
+		return this.rootCategory;
+	}
+	
 	public void setModel(Model m) {
 		this.model = m;
 		setUpTable();
@@ -244,7 +247,6 @@ public class ExpenseController implements Initializable{
 	public void addSubCategoryToTree(TreeItem<Category> c, Category p) {
 		//Get the children of the root
 		ObservableList<TreeItem<Category>> rootChildren = root.getChildren();
-		
 		//create an subcategory node 
 		TreeItem<Category> subCategory = new TreeItem<Category>(p);
 		//find the category 
@@ -254,51 +256,38 @@ public class ExpenseController implements Initializable{
 		categoryTreeItem.getChildren().add(subCategory);
 	}
 	
-//	private TreeItem<Category> getSubCategoryFromTree(TreeItem<Category> c, Category p) {//find the category
-//		ObservableList<TreeItem<Category>> categoryChildren = c.getChildren();
-//		for (TreeItem<Category> subCategoryTreeItem: categoryChildren) {
-//			if(p == subCategoryTreeItem.getValue()) {
-//				return subCategoryTreeItem;
-//			}
-//		}
-//		return null;
-//	}
-	
 	// this function is reposnible for updating all items inside table when newly instance of the app is made 
 	public void setUpTable() {
 		if(this.model != null) {
 			//Get the children of the root
 			ObservableList<TreeItem<Category>> rootChildren = root.getChildren();
-//			try {
-				//Loop through the categories and add them to the table
-				for( Category c: this.model.getCategories()) {
-					//create a category item and make it "always" expanded
-					TreeItem<Category> category = new TreeItem<Category>(c);
-					category.setExpanded(true);
-					category.expandedProperty().addListener(observable -> {
-			            if (!category.isExpanded()) {
-			            	category.setExpanded(true);
-			            }
-			        });
-					
-					//add the category to the table
-					rootChildren.add(category);
-					
-					//get the options of that category 
-					ArrayList<Category> cList = this.model.getSubCategories().get(c.getName());
-					// check if the options exist
-					if (cList != null) {
-						//Loop through the options if not empty
-						if(!cList.isEmpty()) {
-							for(Category p: cList) {
-								//create an option node and add it under its category
-								TreeItem<Category> option = new TreeItem<Category>(p);
-								category.getChildren().add(option);
-							}
+			for( Category c: this.model.getCategories()) {
+				//create a category item and make it "always" expanded
+				TreeItem<Category> category = new TreeItem<Category>(c);
+				category.setExpanded(true);
+				category.expandedProperty().addListener(observable -> {
+		            if (!category.isExpanded()) {
+		            	category.setExpanded(true);
+		            }
+		        });
+				
+				//add the category to the table
+				rootChildren.add(category);
+				
+				//get the options of that category 
+				ArrayList<Category> cList = this.model.getSubCategories().get(c.getName());
+				// check if the options exist
+				if (cList != null) {
+					//Loop through the options if not empty
+					if(!cList.isEmpty()) {
+						for(Category p: cList) {
+							//create an option node and add it under its category
+							TreeItem<Category> option = new TreeItem<Category>(p);
+							category.getChildren().add(option);
 						}
 					}
 				}
-//			}catch(Exception e) {e.printStackTrace();}
+			}
 		}
 	}
 }
