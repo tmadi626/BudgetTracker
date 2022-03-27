@@ -4,7 +4,6 @@ public enum Page {
 	HOME,
 	EXPENSES,
 	INCOME,
-	HISTORY,
-	GOALS,
+	TRANSACTIONS,
 	SUMMARY;
 }

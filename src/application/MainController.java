@@ -17,7 +17,7 @@ public class MainController implements Initializable{
 	@FXML
 	private StackPane contentArea;
 	@FXML
-	private Button btnHome, btnExpenses, btnIncome, btnHistory, btnSummary;
+	private Button btnHome, btnExpenses, btnIncome, btnTransactions, btnSummary;
 	
 	private Button currBtn = null;
 	
@@ -30,19 +30,19 @@ public class MainController implements Initializable{
 	private Parent homeRoot;
 	private Parent incomeRoot;
 	private Parent expenseRoot;
-//	private Parent histroyRoot;
+	private Parent transactionRoot;
 //	private Parent summaryRoot;
 	
 	private FXMLLoader homeFXML;
 	private FXMLLoader incomeFXML;
 	private FXMLLoader expenseFXML;
-//	private FXMLLoader historyFXML;
+	private FXMLLoader transactionFXML;
 //	private FXMLLoader summaryFXML;
 	
 	private HomeController homeController;
 	private ExpenseController expenseController;
 	private IncomeController incomeController;
-//	private HistoryController historyController;
+	private TransactionsController transactionController;
 //	private SummaryController summaryController;
 	
 	public void btnHome(ActionEvent e) throws IOException{
@@ -72,13 +72,12 @@ public class MainController implements Initializable{
 		}
 	}
 	
-	public void btnHistory(ActionEvent e) throws IOException{
-		if ( currPage != Page.HISTORY) {	
+	public void btnTransaction(ActionEvent e) throws IOException{
+		if ( currPage != Page.TRANSACTIONS) {	
 			contentArea.getChildren().removeAll();
-//			contentArea.getChildren().setAll(root);
-			contentArea.getChildren().setAll();
-			currPage = Page.HISTORY;
-			setButton(btnHistory);
+			contentArea.getChildren().setAll(this.transactionRoot);
+			currPage = Page.TRANSACTIONS;
+			setButton(btnTransactions);
 		}
 	}
 
@@ -101,12 +100,14 @@ public class MainController implements Initializable{
 	
 	public void setModel(Model m) {
 		this.model = m;
-		if(this.homeController != null) {//Set the home controller's Database model
+		if(this.homeController != null) {//Set The Home controller's Database model
 			this.homeController.setModel(m);
-		}if(this.expenseController != null) {//Set the expense controller's Database model
+		}if(this.expenseController != null) {//Set The Expense controller's Database model
 			this.expenseController.setModel(m);
-		}if(this.incomeController != null) {//Set the income controller's Database model
+		}if(this.incomeController != null) {//Set The Income controller's Database model
 			this.incomeController.setModel(m);
+		}if(this.transactionController != null) {//Set The Transactions controller's Database model
+			this.transactionController.setModel(m);
 		}
 	}
 	
@@ -136,6 +137,12 @@ public class MainController implements Initializable{
 			this.incomeRoot = this.incomeFXML.load();
 			this.incomeController = this.incomeFXML.getController();
 		} catch(Exception e) {System.out.println(e);}
+		try {
+			//Loading Transactions Page
+			this.transactionFXML = new FXMLLoader(getClass().getResource("/transactionsPage.fxml"));//Getting the FXML file
+			this.transactionRoot = this.transactionFXML.load();
+			this.transactionController = this.transactionFXML.getController();
+		} catch(Exception e) {System.out.println(e);}
 	
 	}
 	
@@ -145,6 +152,7 @@ public class MainController implements Initializable{
 			this.loadFiles();// MUST LOAD FILES FIRST
 			this.homeController.setExpenseController(expenseController);
 			this.homeController.setIncomeController(incomeController);
+			this.homeController.setTransactionController(transactionController);
 			//setting the home page as the first page
 			contentArea.getChildren().removeAll();
 			contentArea.getChildren().setAll(this.homeRoot);

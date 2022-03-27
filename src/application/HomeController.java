@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -17,6 +18,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+import application.TransactionsController;
 
 
 
@@ -32,9 +35,12 @@ public class HomeController implements Initializable{
 	private RadioButton typeIncome, typeExpense; 
 	@FXML
 	private ProgressBar budgetMeter;
+	@FXML
+	private VBox recentTransactionsList;
 	
 	private ExpenseController expenseController;
 	private IncomeController incomeController;
+	private TransactionsController transactionsController;
 	
 	private HashMap<String, String[]> options = new HashMap<String, String[]>();
 	
@@ -63,10 +69,14 @@ public class HomeController implements Initializable{
 	private String[] Wages = {"Paycheck","Bonus", "Others"};
 	private String[] incomeOther = {"Transfer from savings","Interest Income", "Dividends", "Gifts", "Refunds", "Investments"};
 	
+	//The list set for the recent transactions
+	private ArrayList<RecentTransaction> recentList = new ArrayList<RecentTransaction>();
 
-	
+	//Model object
 	private Model model;
-	private Double monthlyBudget;
+	//The monthly budget value set by the user
+	private Double monthlyBudget = 0.0;
+	//The result of the left to spend
 	private Double leftToSpend;
 	
 	BigDecimal progressValue = new BigDecimal(String.format("%.2f", 0.0));
@@ -79,19 +89,25 @@ public class HomeController implements Initializable{
 		String price = numField.getText();
 		LocalDate date = dateField.getValue();
 		String category = categoryField.getValue();
-		String type = subCategoryField.getValue();
+		String subCategory = subCategoryField.getValue();
 		TransactionType typeTransaction = getTransactionType();
 
 		//Add the transaction if the data valid - Not Done
 		if(fieldsValid()) {
 			//Adding the Transaction to Income Sheet:
 			if(typeTransaction == TransactionType.INCOME) {
-				incomeController.addTransaction(title, price, date, category, type, typeTransaction);		
+				incomeController.addTransaction(title, price, date, category, subCategory, typeTransaction);
+				
+				recentTransactionsList.getChildren().add( new RecentTransaction(title, category, TransactionType.INCOME, price, date));//Adding to the recent transactions menu
 			}//Adding the Transaction to Expesne Sheet:
 			else if (typeTransaction == TransactionType.EXPENSE) {
-				expenseController.addTransaction(title, price, date, category, type, typeTransaction);
-			}
+				expenseController.addTransaction(title, price, date, category, subCategory, typeTransaction);
+				
+				recentTransactionsList.getChildren().add( new RecentTransaction(title, category, TransactionType.EXPENSE , price, date));//Adding to the recent transactions menu
 
+			}
+			//Adding it to the list of Transactions
+			this.transactionsController.addTransaction(title, typeTransaction, category, subCategory, date, price);
 			//Clear the fields while keeping the date and the catagory
 			titleField.clear();
 			numField.clear();
@@ -173,6 +189,10 @@ public class HomeController implements Initializable{
 		this.incomeController = c;
 	}
 	
+	public void setTransactionController(TransactionsController c) {
+		this.transactionsController = c;
+	}
+	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		
@@ -197,7 +217,7 @@ public class HomeController implements Initializable{
 
 		        }else if(newValue.matches("\\d*")){
 		        	setMonthlyBudget();
-		        	System.out.println("monthlyBudgetField Updating");
+//		        	System.out.println("monthlyBudgetField Updating");
 		        }
 		    }
 		});
@@ -277,19 +297,24 @@ public class HomeController implements Initializable{
 			value = expenseController.getRootCategory().getDec();
 		}
 		
-		this.leftToSpend = monthlyBudget-value;
+		this.leftToSpend = (monthlyBudget-value);
 		
 		leftToSpendField.setText( String.valueOf(this.leftToSpend));
-		
-		//Updating the Progress Bar (Budget Meter)
-		if(0<= (int) Math.round(this.leftToSpend/monthlyBudget)) {
-			progressValue = new BigDecimal(String.format("%.5f", this.leftToSpend/monthlyBudget));
-			this.budgetMeter.setProgress(progressValue.doubleValue());
-		}else {
-			System.out.println("ZERO!");
-			progressValue = new BigDecimal(String.format("%.2f", 0.0));
-			this.budgetMeter.setProgress(progressValue.doubleValue());
+		try {
+			//Updating the Progress Bar (Budget Meter)
+			if(0<= (int) Math.round(this.leftToSpend/monthlyBudget)) {
+				progressValue = new BigDecimal(String.format("%.5f", (this.leftToSpend/monthlyBudget)*1.0 ));
+				this.budgetMeter.setProgress(progressValue.doubleValue());
+			}else {
+//				System.out.println("ZERO!");
+				progressValue = new BigDecimal(String.format("%.2f", 0.0));
+				this.budgetMeter.setProgress(progressValue.doubleValue());
+			}
+		}catch(Exception e) {
+			
 		}
+
+		
 	}
 	
 	@FXML

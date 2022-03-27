@@ -1,8 +1,9 @@
 package application;
 
-import java.net.URL;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.SimpleDoubleProperty;
