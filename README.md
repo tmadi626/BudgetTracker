@@ -65,7 +65,7 @@ At this point, if you type 'ls', you should be able to see all the files in the 
 ## ✍️ Authors <a name = "authors"></a>
 
 - [Taha Madi](https://github.com/tmadi626) 
-- [Robert Stairs]()
+- [Robert Stairs](https://github.com/ramstairs)
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 
