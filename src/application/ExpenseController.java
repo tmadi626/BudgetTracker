@@ -1,7 +1,6 @@
 package application;
 
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,7 +16,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.util.Callback;
 
-public class ExpenseController implements Initializable{
+public class ExpenseController implements View, Initializable{
 
 	@FXML
 	private TreeTableView<Category> expenseTreeTableView;
@@ -143,66 +142,59 @@ public class ExpenseController implements Initializable{
 	}
 
 	
-	public void addTransaction(String title, String price, LocalDate date, String catagory, String type, TransactionType typeTransaction) {
-		// Create a new Transaction
-		Transaction newTransaction = new Transaction(title, Double.parseDouble(price), date, typeTransaction);
-//		System.out.println("----------------------------------------");
-//		System.out.println("Transaction created: ("+title+", "+price+", "+date+", "+typeTransaction+").");
+	public void addTransaction(String category, String subcategory, Transaction newTransaction) {
+
+		String catagory = category;
+		String subCategory = subcategory;
 		
 		//If the category already exists
 		if(this.model.categoryExist(catagory)) {
 			
-			// check if the option exists:
-			if(this.model.subCategoriesExist(catagory, type)) {
-				//get the option
-				Category p = this.model.getSubCategoryWithName(catagory, type);
-				// Add the transaction to the option
-				p.addTransaction(newTransaction);
+			// check if the subCategory exists:
+			if(this.model.subCategoriesExist(catagory, subCategory)) {
+				// Add the transaction to the subCategory
+				this.model.addTransaction(catagory, subCategory, newTransaction);
 			}
 			//If the option doesnt exist
 			else {
 				//Get the Category
 				Category c = this.model.getCategoryWithName(catagory);
 				//Create new option
-				Category newOption = new Category(type,false, c);
-				// Add the Child(newOption) to the Parent(newCategory)
-				c.addToChildren(newOption);
+				Category newSubCategory = new Category(subCategory,false, c);
+				// Add the Child(newSubCategory) to the Parent(newCategory)
+				c.addToChildren(newSubCategory);
 				// Add the transaction to the option
-				newOption.addTransaction(newTransaction);
-				// Add the option to the list of options of that category	
-				this.model.getSubCategories().get(catagory).add(newOption);
+				newSubCategory.addTransaction(newTransaction);
+				// Add the subCategory to the list of subCategories of that category	
+				this.model.addSubCategory(catagory, newSubCategory);
 				
 				//Tree view
 				//Get the Category
 				TreeItem<Category> categoryTreeItem = this.getCategoryFromTree(c);
-				this.addSubCategoryToTree(categoryTreeItem, newOption);
+				this.addSubCategoryToTree(categoryTreeItem, newSubCategory);
 			}
 		}
 		//If the category does not exist
 		else {
 			//Create a new Category
 			Category newCategory = new Category(catagory,true, rootCategory);
-			// Add the Child(newCategory) to the Parent(rootCategory)
+			// Add the Child(newCategory) to the Parent(rootCategory) - this is for the GUI TreeView
 			rootCategory.addToChildren(newCategory);
 			//Create a new Option
-			Category newOption = new Category(type,false, newCategory);
+			Category newSubCategory = new Category(subCategory,false, newCategory);
 			// Add the Child(newOption) to the Parent(newCategory)
-			newCategory.addToChildren(newOption);
-			// Add the transaction to the option
-			newOption.addTransaction(newTransaction);
+			newCategory.addToChildren(newSubCategory);
+			// Add the transaction to the subCategory
+			newSubCategory.addTransaction(newTransaction);
 			// Add the category to the list of catagories
-			this.model.getCategories().add(newCategory);
-			// Add a new array list of options to the new category
-			this.model.getSubCategories().put(catagory, new ArrayList<Category>());
-			// Add the option to the array list of options of that category	
-			this.model.getSubCategories().get(catagory).add(newOption);
+			this.model.addCategory(newCategory);
+			// Add a an empty array list of newSubCategory to the newCategory
+			this.model.addSubCategory(catagory, new ArrayList<Category>(), newSubCategory);
 			
 			//Tree View
 			TreeItem<Category> categoryTreeItem = this.addCategoryToTree(newCategory);
-			this.addSubCategoryToTree(categoryTreeItem, newOption);
+			this.addSubCategoryToTree(categoryTreeItem, newSubCategory);
 		}
-		
-		expenseTreeTableView.refresh();
 	}
 	
 	
@@ -290,5 +282,11 @@ public class ExpenseController implements Initializable{
 				}
 			}
 		}
+	}
+
+
+	@Override
+	public void update() {
+		expenseTreeTableView.refresh();
 	}
 }

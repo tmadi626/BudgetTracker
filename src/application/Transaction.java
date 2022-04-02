@@ -25,7 +25,7 @@ public class Transaction {
     public void setName(String name) {
         this.name = name;
     }
-
+    
     public double getValue() {
         return value;
     }

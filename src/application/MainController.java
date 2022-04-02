@@ -100,14 +100,18 @@ public class MainController implements Initializable{
 	
 	public void setModel(Model m) {
 		this.model = m;
-		if(this.homeController != null) {//Set The Home controller's Database model
+		if(this.homeController != null) {//Set The Home controller's Database model And set Observers
 			this.homeController.setModel(m);
+			this.model.attachOberver(homeController);
 		}if(this.expenseController != null) {//Set The Expense controller's Database model
 			this.expenseController.setModel(m);
+			this.model.attachOberver(expenseController);
 		}if(this.incomeController != null) {//Set The Income controller's Database model
 			this.incomeController.setModel(m);
+			this.model.attachOberver(incomeController);
 		}if(this.transactionController != null) {//Set The Transactions controller's Database model
 			this.transactionController.setModel(m);
+			this.model.attachOberver(transactionController);
 		}
 	}
 	
@@ -153,6 +157,8 @@ public class MainController implements Initializable{
 			this.homeController.setExpenseController(expenseController);
 			this.homeController.setIncomeController(incomeController);
 			this.homeController.setTransactionController(transactionController);
+			
+			
 			//setting the home page as the first page
 			contentArea.getChildren().removeAll();
 			contentArea.getChildren().setAll(this.homeRoot);

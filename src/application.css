@@ -66,3 +66,23 @@
 #AddTransactionBtn:pressed{
 	-fx-background-color: #0D819A;
 }
+.recentTransactionItem{
+	-fx-border-color: #DADADA;
+	-fx-border-style: solid hidden solid hidden;
+	-fx-effect: dropshadow( gaussian, rgba(0, 0, 0, 0.3), 10, 0.2 , 0.0 , 0.0);
+	-fx-background-color: #FFFFFF;
+}
+.recentTransactionItem:hover{
+	-fx-background-color: #DADADA;
+}
+
+.transactionItem{
+	
+	-fx-border-color: #DADADA;
+	-fx-background-color: #FFFFFF;
+	/*-fx-effect: dropshadow( gaussian, rgba(0, 0, 0, 0.3), 10, 0.2 , 0.0 , 0.0);*/
+}
+
+.transactionItem:hover{
+	-fx-background-color: #DADADA;
+}

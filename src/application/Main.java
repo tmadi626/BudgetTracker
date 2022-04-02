@@ -30,7 +30,7 @@ public class Main extends Application {
 			controller.setModel(this.model);
 			
 			//I can iniate the Model here and pass it by calling the loader's controller...
-			Scene scene = new Scene(root,800,600,Color.web("EAE9F0"));
+			Scene scene = new Scene(root,750,500,Color.web("EAE9F0"));
 			scene.getStylesheets().add("/application.css");
 
 			//making an icon and setting it

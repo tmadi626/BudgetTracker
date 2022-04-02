@@ -62,9 +62,9 @@
                   <Pane prefHeight="224.0" prefWidth="273.0" style="-fx-background-color: ffffff;" styleClass="container">
                      <children>
                         <Label alignment="CENTER" contentDisplay="CENTER" graphicTextGap="6.0" layoutX="55.0" layoutY="15.0" text="Recent Transactions" />
-                        <ScrollPane layoutX="3.0" layoutY="50.0" prefHeight="168.0" prefWidth="266.0" style="-fx-background-color: ffffff;">
+                        <ScrollPane layoutX="3.0" layoutY="50.0" prefHeight="168.0" prefWidth="266.0" style="-fx-border-color: #DADADA; -fx-background-color: ffffff; -fx-border-style: solid hidden hidden hidden;">
                            <content>
-                              <VBox fx:id="recentTransactionsList" alignment="CENTER" prefHeight="165.0" prefWidth="263.0" spacing="5.0" style="-fx-background-color: ffffff;" />
+                              <VBox fx:id="recentTransactionsList" alignment="TOP_CENTER" prefHeight="165.0" prefWidth="246.0" spacing="3.0" style="-fx-background-color: ffffff;" />
                            </content>
                         </ScrollPane>
                         <ImageView fitHeight="25.0" fitWidth="30.0" layoutX="19.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true">
@@ -106,6 +106,12 @@
                                        </image>
                                     </ImageView>
                                  </children>
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin>
+                                 <padding>
+                                    <Insets bottom="2.0" />
+                                 </padding>
                               </Pane>
                               <HBox spacing="10.0">
                                  <children>

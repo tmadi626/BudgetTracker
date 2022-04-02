@@ -7,16 +7,36 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 
 public class TransactionItem extends AnchorPane{
 	@FXML
 	CheckBox transactionCheck;
 	@FXML
+	ImageView deleteBtn;
+	@FXML
 	Label transactionTitle, transactionType, transactionCategory, transactionSubcategory, transactionDate, transactionAmmount;
 	
+	Transaction transaction;
 	
-	public TransactionItem(String t, TransactionType ty, String c, String sc, LocalDate d, String amm) {
+	String title, category, subCategory, amm, tType;
+	TransactionType ty;
+	LocalDate d;
+	
+	TransactionsController transCntrl;
+	
+	public TransactionItem(String category, String subcategory, Transaction newTransaction, TransactionsController transCntrl) {
+		this.transaction = newTransaction;
+		this.title = newTransaction.getName();
+		this.ty = newTransaction.getType();
+		this.category = category;
+		this.subCategory = subcategory;
+		this.d = newTransaction.getDate();
+		this.amm = Double.toString( newTransaction.getValue() );
+		
+		this.transCntrl = transCntrl;
+		
 		//Making the Transaction Item as a component
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/transactionItem.fxml"));
         loader.setRoot(this);
@@ -32,20 +52,31 @@ public class TransactionItem extends AnchorPane{
         
 		String tType ="";
 		if(ty == TransactionType.EXPENSE) {
-			tType = "Expense";
+			this.tType = "Expense";
 		}else {
-			tType = "Income";
+			this.tType = "Income";
 		}
         //Setting the components features:
-        this.transactionTitle.setText(t);
-        this.transactionType.setText(tType);
-        this.transactionCategory.setText(c);
-        this.transactionSubcategory.setText(sc);
-        this.transactionDate.setText(d.toString());
-        this.transactionAmmount.setText("$"+adjustAmmount(amm));
+        this.transactionTitle.setText(this.title);
+        this.transactionType.setText(this.tType);
+        this.transactionCategory.setText(this.category);
+        this.transactionSubcategory.setText(this.subCategory);
+        this.transactionDate.setText(this.d.toString());
+        this.transactionAmmount.setText("$"+adjustAmmount(this.amm));
         
 	}
 
+	public Transaction getTransaction() {
+		return this.transaction;
+	}
+	
+	@FXML
+	private void deleteTransaction() {
+		System.out.println("Deleting: "+ this.title+ ", under:" + this.subCategory+ "...");
+		//String t, TransactionType ty, String c, String sc, LocalDate d, String amm
+		this.transCntrl.deleteTransaction(this);
+		
+	}
 	private String adjustAmmount(String amm) {
 		int ammLen = amm.length();
 		

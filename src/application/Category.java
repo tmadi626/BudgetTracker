@@ -64,7 +64,9 @@ public class Category {
 				avg += child.getAvg();				
 			}
 			if (this.parent == null) {
-				this.children.get(0).printTransactions();
+//				System.out.println("Category| This is: "+this.name+ " 1st Child: "+this.children.get(0).getName() );
+//				//Wage				//PayCheck
+//				this.children.get(0).children.get(0).printTransactions();
 				return;
 			}
 		}
@@ -80,6 +82,10 @@ public class Category {
 		return transactions;
 	}
 	public void printTransactions(){
+		System.out.println("Category| Printing Transactions...");
+		if(transactions.isEmpty()) {
+			System.out.println("Category| No transaction");
+		}
 		for(Transaction el: transactions) {
 			System.out.print(el.getName() + "| ");
 		}
@@ -92,8 +98,8 @@ public class Category {
 	}
 	
 	public void removeTransaction(Transaction transaction) {//This is wrong because when a transacion is passed it adds doesnt subtract
+		updateValues(transaction, false);	//This has to occur first.
 		transactions.remove(transaction);
-		updateValues(transaction, false);
 		parent.updateParentValues();
 	}
 	

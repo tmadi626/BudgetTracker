@@ -19,11 +19,10 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import application.TransactionsController;
 
 
 
-public class HomeController implements Initializable{
+public class HomeController implements View, Initializable{
 	
 	@FXML
 	private TextField titleField, numField, leftToSpendField, monthlyBudgetField;
@@ -94,20 +93,22 @@ public class HomeController implements Initializable{
 
 		//Add the transaction if the data valid - Not Done
 		if(fieldsValid()) {
+			Transaction newTransaction = new Transaction(title, Double.parseDouble(price), date, typeTransaction);
+			//Adding it to the list of Transactions
+			this.transactionsController.addTransaction(category, subCategory, newTransaction);
 			//Adding the Transaction to Income Sheet:
 			if(typeTransaction == TransactionType.INCOME) {
-				incomeController.addTransaction(title, price, date, category, subCategory, typeTransaction);
+				incomeController.addTransaction(category, subCategory, newTransaction);
 				
 				recentTransactionsList.getChildren().add( new RecentTransaction(title, category, TransactionType.INCOME, price, date));//Adding to the recent transactions menu
 			}//Adding the Transaction to Expesne Sheet:
 			else if (typeTransaction == TransactionType.EXPENSE) {
-				expenseController.addTransaction(title, price, date, category, subCategory, typeTransaction);
+				expenseController.addTransaction(category, subCategory, newTransaction);
 				
 				recentTransactionsList.getChildren().add( new RecentTransaction(title, category, TransactionType.EXPENSE , price, date));//Adding to the recent transactions menu
 
 			}
-			//Adding it to the list of Transactions
-			this.transactionsController.addTransaction(title, typeTransaction, category, subCategory, date, price);
+
 			//Clear the fields while keeping the date and the catagory
 			titleField.clear();
 			numField.clear();
@@ -342,6 +343,10 @@ public class HomeController implements Initializable{
 			System.out.println(e);
 		}
 
+	}
+
+	@Override
+	public void update() {
 	}
 
 
