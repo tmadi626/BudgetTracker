@@ -60,7 +60,7 @@ At this point, if you type 'ls', you should be able to see all the files in the 
 
 - Java
 - JavaFX
-- MySQL
+- H2 Database
 
 ## ✍️ Authors <a name = "authors"></a>
 
