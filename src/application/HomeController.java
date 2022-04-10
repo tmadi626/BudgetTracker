@@ -3,24 +3,27 @@ package application;
 import java.math.BigDecimal;
 //import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.ResourceBundle;
-
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-
-
 
 public class HomeController implements View, Initializable{
 	
@@ -36,10 +39,13 @@ public class HomeController implements View, Initializable{
 	private ProgressBar budgetMeter;
 	@FXML
 	private VBox recentTransactionsList;
+	@FXML
+	private PieChart categoryPie;
 	
 	private ExpenseController expenseController;
 	private IncomeController incomeController;
 	private TransactionsController transactionsController;
+	private SummaryController summaryController;
 	
 	private HashMap<String, String[]> options = new HashMap<String, String[]>();
 	
@@ -64,12 +70,13 @@ public class HomeController implements View, Initializable{
 
 	//Income Options:
 	private String[] incomeCategoryList = {"Wages","Other Income"};
-	
 	private String[] Wages = {"Paycheck","Bonus", "Others"};
 	private String[] incomeOther = {"Transfer from savings","Interest Income", "Dividends", "Gifts", "Refunds", "Investments"};
 	
 	//The list set for the recent transactions
 	private ArrayList<RecentTransaction> recentList = new ArrayList<RecentTransaction>();
+	private ArrayList<Category> recentCategories = new ArrayList<Category>();
+	private ArrayList<RecentTransaction> recentExpenses = new ArrayList<RecentTransaction>();
 
 	//Model object
 	private Model model;
@@ -79,10 +86,67 @@ public class HomeController implements View, Initializable{
 	private Double leftToSpend;
 	
 	BigDecimal progressValue = new BigDecimal(String.format("%.2f", 0.0));
-
 	
+	// Sets the list of recent transactions and the related visual elements to the 10 most recent fetched from the DB.
+	// Called in AddTransaction() after the transaction is added to the DB.
+	public void updateRecentTrans() throws SQLException {
+		
+		recentList = DBConn.FetchRecents(false); // Grabs 10 most recent transactions from Transactions table.
+		recentTransactionsList.getChildren().clear(); // Clear previous list of most recent transactions.
+		
+		for (RecentTransaction r : recentList) { // Set the children of the recentTransactionsList to the new list.
+			recentTransactionsList.getChildren().add(r);
+		}
+	}
+	
+	public void loadCategoryPie() throws SQLException {
+		
+		recentExpenses = DBConn.FetchRecents(true); // Get the 10 most recent EXPENSE transactions.
+		
+		// Sets the private field recentCategories, the list of the most recent categories spent in.
+		for (int i = 0; i < recentExpenses.size(); i++) // For all recent transactions...
+		{
+			Category newCat = model.getCategoryWithName(recentExpenses.get(i).getCategoryName()); // Get category of RecentTransaction...
+			
+			if (recentCategories.size() == 0) // If recent categories list is empty, add it.
+				recentCategories.add(newCat);
+			
+			Boolean addToRecentCats = true;
+			
+			for (int j = 0; j < recentCategories.size(); j++) { // If the category of RecentTransaction at recentList.get(i) is nowhere in recentCategories, add it.
+				if (recentCategories.get(j).getName().equals(recentExpenses.get(i).getCategoryName()))
+				{
+					addToRecentCats = false; // Category was already in the recent list, discard it.
+				}
+			}
+				
+			if (addToRecentCats) {
+				recentCategories.add(newCat); // Category was not already in the recent list, add it.
+			}	
+		}
+		
+		// Now gather the data to put in the PieChart.
+		ObservableList<PieChart.Data> list = FXCollections.observableArrayList(); // List of pie slices.
+		
+		for (Category c : recentCategories) {
+			list.add(new PieChart.Data(c.getName(), c.getCurrMonth())); // Create a pie slices for every recent expense category.
+		}
+		
+		String thisMonth = LocalDate.now().getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+		
+		
+		// Set the pie chart's properties.
+		categoryPie.setData(list);
+		categoryPie.setTitle(thisMonth + " Categorical Spending");
+		categoryPie.setClockwise(true);
+		categoryPie.setLabelLineLength(10);
+		categoryPie.setLabelsVisible(true);
+//		categoryPie.setLegendVisible(true);
+//		categoryPie.setLegendSide(Side.LEFT);
+	}
+		
 	@FXML
-	private void addTransaction() {
+	private void addTransaction() throws SQLException {
 		//Get the data
 		String title = titleField.getText();
 		String price = numField.getText();
@@ -93,28 +157,41 @@ public class HomeController implements View, Initializable{
 
 		//Add the transaction if the data valid - Not Done
 		if(fieldsValid()) {
-			Transaction newTransaction = new Transaction(title, Double.parseDouble(price), date, typeTransaction);
+			
+			// Add the new valid Transaction to the Transactions table of the database.
+			Transaction trans = new Transaction(title, (int) Math.round(Double.valueOf(price)), date, typeTransaction);
+			try {
+				DBConn.AddTransToDB(trans, category, subCategory);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	
 			//Adding it to the list of Transactions
-			this.transactionsController.addTransaction(category, subCategory, newTransaction);
+			this.transactionsController.addToTransactionList(category, subCategory, trans);
+			
+			updateRecentTrans(); // Set the recent transactions to the updated 10 newest in the SQL database.
+			
 			//Adding the Transaction to Income Sheet:
 			if(typeTransaction == TransactionType.INCOME) {
-				incomeController.addTransaction(category, subCategory, newTransaction);
+				incomeController.addTransaction(category, subCategory, trans);
 				
-				recentTransactionsList.getChildren().add( new RecentTransaction(title, category, TransactionType.INCOME, price, date));//Adding to the recent transactions menu
-			}//Adding the Transaction to Expesne Sheet:
+			}
+			//Adding the Transaction to Expense Sheet:
 			else if (typeTransaction == TransactionType.EXPENSE) {
-				expenseController.addTransaction(category, subCategory, newTransaction);
+				expenseController.addTransaction(category, subCategory, trans);
 				
-				recentTransactionsList.getChildren().add( new RecentTransaction(title, category, TransactionType.EXPENSE , price, date));//Adding to the recent transactions menu
-
 			}
 
-			//Clear the fields while keeping the date and the catagory
+			//Clear the fields while keeping the date and the category
 			titleField.clear();
 			numField.clear();
 			
 			//Update the left to spend field 
 			setLeftToSpendField();
+			model.notifyObservers();
+			
+			loadCategoryPie();
 		}
 
 	}
@@ -194,6 +271,10 @@ public class HomeController implements View, Initializable{
 		this.transactionsController = c;
 	}
 	
+	public void setSummaryController(SummaryController c) {
+		this.summaryController = c;
+	}
+	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
 		
@@ -207,23 +288,28 @@ public class HomeController implements View, Initializable{
 		        }
 		    }
 		});
-		//Initlize the left to spend Field
-		monthlyBudgetField.setText("0");
+		//Initialize the left to spend Field
+		monthlyBudgetField.setText(String.valueOf(DBConn.FetchBudget(LocalDate.now().getMonth(), this))); // Set this to the value in the the Budget table for the current month.
 		monthlyBudgetField.textProperty().addListener(new ChangeListener<String>() {
 		    @Override
 		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
 		        String newValue) {
 		        if (!newValue.matches("\\d*")) {
-		        	monthlyBudgetField.setText(newValue.replaceAll("[^\\d]", "") );	//Integers not doubles
+		        	monthlyBudgetField.setText(newValue.replaceAll("[^\\d]", "") );	//Integers not doubles.
 
 		        }else if(newValue.matches("\\d*")){
-		        	setMonthlyBudget();
+		        	try {
+						setMonthlyBudget();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 //		        	System.out.println("monthlyBudgetField Updating");
 		        }
 		    }
 		});
 		
-		//Inilizing categories with their corresponding options
+		//Initializing categories with their corresponding options.
 		//Expense Options
 		options.put("Children", Children);
 		options.put("Debt", Debt);
@@ -244,7 +330,7 @@ public class HomeController implements View, Initializable{
 		options.put("Wages", Wages);
 		options.put("Other Income", incomeOther);
 		
-		//Initializing predetermined List of Catagories to the dropdown
+		//Initializing predetermined List of Categories to the drop-down menu.
 		setCategoryDropDown();
 
 		//Setting the date field to the current date of the machine
@@ -261,13 +347,24 @@ public class HomeController implements View, Initializable{
 	}
 	
 	@FXML
-	private void setMonthlyBudget() {
+	private void setMonthlyBudget() throws InterruptedException {
 		//This function responsible for setting the "Monthly Budget" field
-		this.monthlyBudget = Double.parseDouble( monthlyBudgetField.getText() );
-		setLeftToSpendField();
+		this.monthlyBudget = Double.valueOf(monthlyBudgetField.getText());
+		
+		DBConn.AddBudgetToDB(LocalDate.now().getMonth(), this.monthlyBudget); // Update the budget amount for the current month in the Budgets table.
+		
+		setLeftToSpendField(); // Update the LeftToSpend Field based on the budget value.
 	}
-	//This function responsible for setting the "Left To Spend" field
-	private void setLeftToSpendField() {
+	
+	public Double getMonthlyBudget() {
+		return this.monthlyBudget;
+	}
+	
+	public void setMonthlyBudget(Double d) {
+		this.monthlyBudget = d;
+	}
+	
+	public void setLeftToSpend() {
 		
 		Month currMonth = LocalDate.now().getMonth();
 		Double value = 0.0;
@@ -298,9 +395,46 @@ public class HomeController implements View, Initializable{
 			value = expenseController.getRootCategory().getDec();
 		}
 		
-		this.leftToSpend = (monthlyBudget-value);
+		this.leftToSpend = (monthlyBudget - value);
+	}
+	
+	//This function responsible for setting the "Left To Spend" field
+	public void setLeftToSpendField() {
+		
+		Month currMonth = LocalDate.now().getMonth();
+		Double value = 0.0;
+		
+		if(currMonth==Month.JANUARY) {
+			value = expenseController.getRootCategory().getJan();
+		}else if(currMonth==Month.FEBRUARY) {
+			value = expenseController.getRootCategory().getFeb();
+		}else if(currMonth==Month.MARCH) {
+			value = expenseController.getRootCategory().getMar();
+		}else if(currMonth==Month.APRIL) {
+			value = expenseController.getRootCategory().getApr();
+		}else if(currMonth==Month.MAY) {
+			value = expenseController.getRootCategory().getMay();
+		}else if(currMonth==Month.JUNE) {
+			value = expenseController.getRootCategory().getJun();
+		}else if(currMonth==Month.JULY) {
+			value = expenseController.getRootCategory().getJul();
+		}else if(currMonth==Month.AUGUST) {
+			value = expenseController.getRootCategory().getAug();
+		}else if(currMonth==Month.SEPTEMBER) {
+			value = expenseController.getRootCategory().getSep();
+		}else if(currMonth==Month.OCTOBER) {
+			value = expenseController.getRootCategory().getOct();
+		}else if(currMonth==Month.NOVEMBER) {
+			value = expenseController.getRootCategory().getNov();
+		}else if(currMonth==Month.DECEMBER) {
+			value = expenseController.getRootCategory().getDec();
+		}
+		
+		// Set LeftToSpend to the current budget - current expenditure this month.
+		this.leftToSpend = (monthlyBudget - value);
 		
 		leftToSpendField.setText( String.valueOf(this.leftToSpend));
+		
 		try {
 			//Updating the Progress Bar (Budget Meter)
 			if(0<= (int) Math.round(this.leftToSpend/monthlyBudget)) {
@@ -314,8 +448,10 @@ public class HomeController implements View, Initializable{
 		}catch(Exception e) {
 			
 		}
-
-		
+	}
+	
+	public Double getLeftToSpend() {
+		return this.leftToSpend;
 	}
 	
 	@FXML
@@ -327,7 +463,7 @@ public class HomeController implements View, Initializable{
 		TransactionType typeTransaction = getTransactionType();
 		if(typeTransaction == TransactionType.INCOME) {
 			categoryField.getItems().addAll(incomeCategoryList);
-		}//Adding the Transaction to Expesne Sheet:
+		}//Adding the Transaction to Expense Sheet:
 		else if (typeTransaction == TransactionType.EXPENSE) {
 			categoryField.getItems().addAll(expenseCategoryList);
 		}
@@ -346,7 +482,13 @@ public class HomeController implements View, Initializable{
 	}
 
 	@Override
-	public void update() {
+	public void update()  { // Reload the recent transactions list and the categorical pie chart as the model's data changed.
+		setLeftToSpendField();
+		try {
+			updateRecentTrans();	
+		}catch(SQLException e) {
+			System.out.println(e);
+		}
 	}
 
 

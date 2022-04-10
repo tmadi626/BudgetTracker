@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SummaryController">
+   <children>
+      <LineChart fx:id="transactionLineChart" layoutY="14.0" legendSide="RIGHT" prefHeight="240.0" prefWidth="600.0" title="Monthly Expenses vs. Income">
+         <xAxis>
+            <CategoryAxis fx:id="monthName" prefHeight="21.0" prefWidth="879.0" side="BOTTOM" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="monthlyTotal" side="LEFT" />
+         </yAxis>
+      </LineChart>
+      <BarChart fx:id="categoryBarChart" layoutY="249.0" legendVisible="false" prefHeight="240.0" prefWidth="600.0" title="Annual Categorical Spending" AnchorPane.topAnchor="249.0">
+        <xAxis>
+          <CategoryAxis fx:id="categoryName" side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="categoryTotal" side="LEFT" />
+        </yAxis>
+      </BarChart>
+   </children>
+</AnchorPane>

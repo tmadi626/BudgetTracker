@@ -1,5 +1,7 @@
 package application;
 	
+import java.sql.SQLException;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -47,8 +49,10 @@ public class Main extends Application {
 		} catch(Exception e) {e.printStackTrace();}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
+		
+		DBConn.ConnectToDB(); // Establish a connection to the database upon startup.
+		DBConn.tableSetUp();
 		launch(args);
 	}
-	
 }

@@ -64,6 +64,10 @@ public class RecentTransaction extends AnchorPane {
 		return this.date;
 	}
 	
+	public String getCategoryName() {
+		return this.category;
+	}
+	
 	private String adjustAmmount(String amm) {
 		int ammLen = amm.length();
 		

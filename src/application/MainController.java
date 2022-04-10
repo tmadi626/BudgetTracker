@@ -2,6 +2,7 @@ package application;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
@@ -31,26 +32,33 @@ public class MainController implements Initializable{
 	private Parent incomeRoot;
 	private Parent expenseRoot;
 	private Parent transactionRoot;
-//	private Parent summaryRoot;
+	private Parent summaryRoot;
 	
 	private FXMLLoader homeFXML;
 	private FXMLLoader incomeFXML;
 	private FXMLLoader expenseFXML;
 	private FXMLLoader transactionFXML;
-//	private FXMLLoader summaryFXML;
+	private FXMLLoader summaryFXML;
 	
 	private HomeController homeController;
 	private ExpenseController expenseController;
 	private IncomeController incomeController;
 	private TransactionsController transactionController;
-//	private SummaryController summaryController;
+	private SummaryController summaryController;
 	
-	public void btnHome(ActionEvent e) throws IOException{
-		if ( currPage != Page.HOME) {
-			contentArea.getChildren().removeAll();
-			contentArea.getChildren().setAll(this.homeRoot);
-			currPage = Page.HOME;
-			setButton(btnHome);
+	public void btnHome(ActionEvent e) throws IOException, SQLException{
+		try {
+			if ( currPage != Page.HOME) {
+				homeController.loadCategoryPie();
+				homeController.updateRecentTrans();
+				contentArea.getChildren().removeAll();
+				contentArea.getChildren().setAll(this.homeRoot);
+				currPage = Page.HOME;
+				setButton(btnHome);
+			}
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 	}
 	
@@ -84,7 +92,7 @@ public class MainController implements Initializable{
 	public void btnSummary(ActionEvent e) throws IOException{
 		if ( currPage != Page.SUMMARY) {
 			contentArea.getChildren().removeAll();
-			contentArea.getChildren().setAll();
+			contentArea.getChildren().setAll(this.summaryRoot);
 			currPage = Page.SUMMARY;
 			setButton(btnSummary);
 		}
@@ -98,21 +106,27 @@ public class MainController implements Initializable{
 		currBtn = b;
 	}
 	
-	public void setModel(Model m) {
+	public void setModel(Model m) throws SQLException {
 		this.model = m;
 		if(this.homeController != null) {//Set The Home controller's Database model And set Observers
 			this.homeController.setModel(m);
-			this.model.attachOberver(homeController);
+			this.model.attachObserver(homeController);
 		}if(this.expenseController != null) {//Set The Expense controller's Database model
 			this.expenseController.setModel(m);
-			this.model.attachOberver(expenseController);
+			this.model.attachObserver(expenseController);
 		}if(this.incomeController != null) {//Set The Income controller's Database model
 			this.incomeController.setModel(m);
-			this.model.attachOberver(incomeController);
+			this.model.attachObserver(incomeController);
 		}if(this.transactionController != null) {//Set The Transactions controller's Database model
 			this.transactionController.setModel(m);
-			this.model.attachOberver(transactionController);
+			this.model.attachObserver(transactionController);
+		}if (this.summaryController != null) { // Set the Summary Controller's Database model
+			this.summaryController.setModel(m);
+			this.model.attachObserver(summaryController);
 		}
+		DBConn.FetchTransactions(expenseController, incomeController, transactionController);
+		homeController.updateRecentTrans();
+		homeController.loadCategoryPie();
 	}
 	
 	public Model getModel() {
@@ -147,6 +161,12 @@ public class MainController implements Initializable{
 			this.transactionRoot = this.transactionFXML.load();
 			this.transactionController = this.transactionFXML.getController();
 		} catch(Exception e) {System.out.println(e);}
+		try {
+			//Loading Transactions Page
+			this.summaryFXML = new FXMLLoader(getClass().getResource("/summaryPage.fxml")); 
+			this.summaryRoot = this.summaryFXML.load();
+			this.summaryController = this.summaryFXML.getController();
+		} catch(Exception e) {System.out.println(e);}
 	
 	}
 	
@@ -157,8 +177,7 @@ public class MainController implements Initializable{
 			this.homeController.setExpenseController(expenseController);
 			this.homeController.setIncomeController(incomeController);
 			this.homeController.setTransactionController(transactionController);
-			
-			
+			this.homeController.setSummaryController(summaryController);
 			//setting the home page as the first page
 			contentArea.getChildren().removeAll();
 			contentArea.getChildren().setAll(this.homeRoot);

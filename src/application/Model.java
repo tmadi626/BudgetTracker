@@ -1,6 +1,6 @@
 package application;
 
-import java.time.LocalDate;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -56,6 +56,8 @@ public class Model {
 		}
 		return null;
 	}
+	
+	
 
 	public void addCategory(Category category) {
 		this.categories.add(category);
@@ -73,27 +75,83 @@ public class Model {
 		this.notifyObservers();
 	}
 	
-	public void addTransaction(String c, String sc, Transaction newTransaction) {// This is added 
+	public void addTransaction(String c, String sc, Transaction newTransaction) throws SQLException { // Add a transaction of an existing category to the Model.
 		ArrayList<Category> scList = this.subCategory.get(c);
 		for(Category el: scList) {
 			if(el.getName() == sc) {
 				el.addTransaction(newTransaction);
 			}
 		}
+		// DBConn.AddTransToDB(newTransaction, c, sc); // Add the transaction to the SQL database for long-term storage.
 		this.notifyObservers();
 	}
 	
-	public void removeTransaction(String c, String sc, Transaction transaction) {// This is added 
+	public void removeTransaction(String c, String sc, Transaction transaction) throws SQLException { // Remove an existing transaction from the Model & DB.
 		ArrayList<Category> scList = this.subCategory.get(c);
 		for(Category el: scList) {
 			if(el.getName() == sc) {
 				el.removeTransaction(transaction);
 			}
 		}
+		DBConn.RemoveTransFromDB(transaction, c, sc); // Remove the transaction from the SQL database.
 		this.notifyObservers();
 	}
 	
-	public void attachOberver(View o) {
+	// Returns the total expenditure in a category throughout all records (used for bar chart in Summary page).
+	public Double getTotalForCategory(Category cat) {
+		
+		Double catTotal = 0.0;
+		
+		for (Transaction t : cat.getTransactions()) {
+			if (t.getTransType().equals("EXPENSE"))
+				catTotal += t.getValue();
+		}
+		if (cat.isParent()) {
+			for (Category c : cat.getChildren()) {
+				catTotal += getTotalForCategory(c);
+			}
+		}
+		return catTotal; 
+	}
+		
+	
+
+	public Double getTotalForMonth(int month, Boolean expenses) { // Used in Summary page line chart.
+		
+		Double total = 0.0;
+		
+		String[] incomeCategoryList = {"Wages","Other Income"};
+		String[] expenseCategoryList = {"Children","Debt","Education","Entertainment","Everyday","Gifts","Health","Home","Insurance","Pets","Technology","Transportation","Travel","Utilities","Invests&eTransfer"};
+		
+			if (expenses) { // Populating the expenses portion of the line chart...
+				
+				for (Category cat : getCategories()) {// For all categories we have transactions in...
+					
+					for (String s : expenseCategoryList) {
+						
+						if (cat.getName().equals(s)) { // If the category is some Expense category...
+							total += cat.getMonth(month); // Get the expense category's expenditure for the passed in month, and all of its subcategories.
+						}
+					}
+				}
+			}
+			
+			else { // Populating the income portion of the line chart...
+				for (Category cat : getCategories()) { // For all categories we have transactions in...
+					
+					for (String s : incomeCategoryList) { 
+						
+						if (cat.getName().equals(s)) { // If the category is some Income category, add its monthly value to the total and all of its subcategories.
+							total += cat.getMonth(month);
+						}
+					}		
+				}
+			}
+		
+		return total;
+	}
+	
+	public void attachObserver(View o) {
 		Observers.add(o);
 	}
 
