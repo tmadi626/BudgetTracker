@@ -32,6 +32,20 @@ It's about time indviduals start taking an active role in tracking their budget 
 
 The BudgetTracker software helps you keep track of your monthly budget so that you never have to lose track of your expenses again. BudgetTracker is currently for desktops. 
 
+
+<p align="center">
+  
+  ![image](https://user-images.githubusercontent.com/72050204/167744673-5bec8cd3-d413-4bc6-a96a-4ba57fa87a26.png)
+
+  ![image](https://user-images.githubusercontent.com/72050204/167744967-b1b27afe-fa2b-4358-8293-c19f06d589ea.png)
+  
+  ![image](https://user-images.githubusercontent.com/72050204/167744933-c77b5f2e-76fb-4551-8ce5-87adc645dc71.png)
+  
+  ![image](https://user-images.githubusercontent.com/72050204/167744758-bbf54c80-e98d-4719-b9cf-cbbf54ef3142.png)
+</p>
+
+
+
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
