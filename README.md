@@ -30,7 +30,7 @@ It's about time indviduals start taking an active role in tracking their budget 
 
 ## 🧐 About <a name = "about"></a>
 
-The BudgetTracker software helps you keep track of your monthly budget so that you never have to lose track of your expenses again. BudgetTracker is currently for desktops and soll will be a cross platform app for iOS and Android. 
+The BudgetTracker software helps you keep track of your monthly budget so that you never have to lose track of your expenses again. BudgetTracker is currently for desktops. 
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
